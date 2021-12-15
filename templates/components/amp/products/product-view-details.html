@@ -1,11 +1,14 @@
 <section class="productView-details">
     <div class="productView-product">
+        <div class="product-badge">
+            testing
+        </div>
+        <h1 class="productView-title" {{#if schema}}itemprop="name"{{/if}}>{{product.title}}</h1>
         {{#if product.brand }}
         <h2 class="productView-brand"{{#if schema}} itemprop="brand" itemscope itemtype="http://schema.org/Brand"{{/if}}>
             <a href="{{product.brand.url}}"{{#if schema}} itemprop="url"{{/if}}><span{{#if schema}} itemprop="name"{{/if}}>{{product.brand.name}}</span></a>
         </h2>
         {{/if}}
-        <h1 class="productView-title" {{#if schema}}itemprop="name"{{/if}}>{{product.title}}</h1>
         {{#if product.call_for_price}}
             <p class="productView-price">
                 <span>{{product.call_for_price}}</span>
@@ -89,11 +92,9 @@
                                 {{lang 'products.bulk_pricing.range' min=min max=max}}
                                 {{#if type '===' 'percent'}}
                                     {{lang 'products.bulk_pricing.percent' discount=discount.formatted}}
-                                {{/if}}
-                                {{#if type '===' 'fixed'}}
+                                {{else if type '===' 'fixed'}}
                                     {{lang 'products.bulk_pricing.fixed' discount=discount.formatted}}
-                                {{/if}}
-                                {{#if type '===' 'price'}}
+                                {{else if type '===' 'price'}}
                                     {{lang 'products.bulk_pricing.price' discount=discount.formatted}}
                                 {{/if}}
                             </li>
@@ -104,23 +105,8 @@
             {{/if}}
 
             {{#each product.custom_fields}}
-                {{#if name '===' 'card_color'}}
-                    {{#unless ../../theme_settings.show_product_card_color}}
-                        <dt class="productView-info-name">{{name}}:</dt>
-                        <dd class="productView-info-value">{{{value}}}</dd>
-                    {{/unless}}
-                {{else if name '===' 'card_label'}}
-                    {{#unless ../../../theme_settings.show_product_card_custom_label}}
-                        <dt class="productView-info-name">{{name}}:</dt>
-                        <dd class="productView-info-value">{{{value}}}</dd>
-                    {{/unless}}
-                {{else}}
-                    {{#startsWith "__" name}}
-                    {{else}}
-                        <dt class="productView-info-name">{{name}}:</dt>
-                        <dd class="productView-info-value">{{{value}}}</dd>
-                    {{/startsWith}}
-                {{/if}}
+                <dt class="productView-info-name">{{name}}:</dt>
+                <dd class="productView-info-value">{{{value}}}</dd>
             {{/each}}
         </dl>
     </div>

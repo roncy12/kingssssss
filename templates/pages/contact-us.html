@@ -1,78 +1,86 @@
 {{#partial "page"}}
-
-{{> components/common/breadcrumbs breadcrumbs=breadcrumbs}}
-
 <main class="page">
 
-  
 
-    {{#if page.sub_pages}}
-        <nav class="navBar">
-            <ul class="navBar-section">
-                {{#each page.sub_pages}}
-                    <li class="navBar-item"><a class="navBar-action" href="{{url}}">{{title}}</a></li>
-                {{/each}}
-            </ul>
-        </nav>
-    {{/if}}
+  <div class="contact-banner">
+        <h1 class="page-heading">{{ page.title }}</h1>
+    </div>
 
-    
-        {{#if forms.contact.success}}
-    <div class="page-content contacts page-content--centered">
-        <div class="thankyou-contacts">
-        <div class="img-thankyou">
-        <img src="https://cdn11.bigcommerce.com/s-vz6unvhe9k/product_images/uploaded_images/thank-you-01.png?t=1579245584&_ga=2.41511840.38678324.1578960961-2022119561.1571639426">
-        </div>
-            {{{lang 'forms.contact_us.successful' shopPath=urls.home}}}
-            </div>
+    <div id="contact-us-page" class="page-content delivery">
+        <div class="contact-form">
+        <h1>Contact Form</h1>
+       <div>
+           <p>You can write to us, phone us during normal business hours or contact us via e-mail by using our contact form.</p>
+
+<p>Please complete the fields in the contact form, giving as much detail as possible. All fields marked * are required. We do not sell or otherwise redistribute the information that you provide. For more details on how we use the information you give us please see our <a class="" href="/privacy/">Privacy Policy</a></p>
+</div>
+{{#if forms.contact.success}}
+            <div id="contact-us-success">{{{lang 'forms.contact_us.successful' shopPath=urls.home}}}</div>
         {{else}}
-          <h1 class="page-heading">{{page.title}}</h1>
-      
             <p>{{{page.content}}}</p>
-          <div class="page-content contacts page-content--centered">
-            {{> components/page/contact-us-form}}
-        {{/if}}
-            </div>
-            <div class="get-in-touch-right">
-        <div class="get-in-touch">
-              
-        <img src="https://cdn11.bigcommerce.com/s-vz6unvhe9k/product_images/uploaded_images/location-icon.png?t=1578622138&_ga=2.16314686.961613175.1578270359-2022119561.1571639426">   
-            
-        <div class="get-in-touch-desc">
-            
-        <h2>You Can Visit Us</h2><a class="" href="https://www.google.com/maps/place/Progress+Mobility+Scooters/@28.5534074,-81.3657324,17z/data=!3m1!4b1!4m5!3m4!1s0x88e77aea2e36a525:0x52768850c6cc3555!8m2!3d28.5534027!4d-81.3635437">Progress Mobility LLC 1217 East Colonial Drive,Orlando, Florida 32803</a>
-            
-        </div>
-            
-            
+       <form data-contact-form class="form" action="{{urls.contact_us_submit}}" method="post">
+    {{inject 'contactEmail' (lang 'forms.validate.contact.email_address')}}
+    {{inject 'contactQuestion' (lang 'forms.validate.contact.question')}}
+    {{#if forms.contact.error}}
+    <div id="contact-us-error">{{> components/common/alert-error forms.contact.error}}</div>
+    {{/if}}
+    <input type="hidden" name="page_id" id="page_id" value="{{forms.contact.page_id}}">
+    <div class="form-row form-row--half">
         
+            <div class="form-field">
+                
+                <input class="form-input" type="text" id="contact_fullname" name="contact_fullname" placeholder="Full Name" value="{{customer.name}}">
+            </div>
+      
+
+       
+            <div class="form-field">
+
+                <input class="form-input" type="text" id="contact_phone" placeholder="Phone" name="contact_phone" value="{{customer.phone}}">
+            </div>
+      
+
+        <div class="form-field">
+            
+            <input class="form-input" type="text" id="contact_email" placeholder="Email" name="contact_email" value="{{customer.email}}">
         </div>
 
+        
+            <div class="form-field">
+                <input class="form-input" placeholder="Company" type="text" id="contact_companyname" name="contact_companyname">
+            </div>
+
+    </div>
+
+    <div class="form-field">
+        
+        <textarea name="contact_question" id="contact_question" placeholder="Message" rows="5" cols="50" class="form-input"></textarea>
+    </div>
+
+    {{{forms.contact.recaptcha.markup}}}
+
+    <div class="form-actions">
+        <input class="button button--primary" type="submit" value="{{lang 'forms.contact_us.submit' }}">
+    </div>
+</form>
+{{/if}}
+            </div>
         <div class="get-in-touch">
-            
-        <img src="https://cdn11.bigcommerce.com/s-vz6unvhe9k/product_images/uploaded_images/phonecall-icon.png?t=1578622137&_ga=2.11579452.961613175.1578270359-2022119561.1571639426">
-             <div class="get-in-touch-desc">
-                 <h2>You Can Give Us A Call</h2>
-            <a onclick="gtag_report_conversion()" class="" href="tel:1-800-997-3077">1-800-997-3077</a>
-                 <p>8AM TO 10PM, 7 DAYS A WEEK!</p>
-              </div>
+        <h3>GET IN TOUCH</h3>
+            <h5>Postal Address</h5>
+            <p>King's Great Buys Plus
+5010 East Vogel Road
+Evansville, Indiana 47715</p>
+            <h5>Contact Numbers</h5>
+            <p>Tel: 812-473-5464</p>
+            <h5>Connect With Us</h5>
+            <img src="{{getImage (cdn 'assets/img/cms/vector2.png')}}">
+            <img src="{{getImage (cdn 'assets/img/cms/vector1.png')}}">
         </div>
-
-        <div class="get-in-touch">
-            
-        <img src="https://cdn11.bigcommerce.com/s-vz6unvhe9k/product_images/uploaded_images/email-iocn.png?t=1578622138&_ga=2.255824896.961613175.1578270359-2022119561.1571639426">
-            
-                <div class="get-in-touch-desc">
-                    <h2>Send Us An Email</h2>
-            <a class="" href="">Sales@ProgressMobility.com</a>
-              </div>
-        </div>
-</div> 
-
-    
+    </div>
 
 </main>
 
 {{/partial}}
 
-{{> layout/base}}
+{{> layout/cms-base}}

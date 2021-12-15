@@ -8,6 +8,7 @@
         {{/if}}
     {{/each}}
 
+    {{> components/amp/products/product-view-details}}
     <section class="productView-images" data-image-gallery>
         <amp-carousel width="250"
             height="250"
@@ -25,22 +26,15 @@
             {{/each}}
         </amp-carousel>
     </section>
-
-    {{> components/amp/products/product-view-details}}
-
     <div class="productView-action">
         {{#or customer (if theme_settings.restrict_to_login '!==' true)}}
-            {{#if product.options}}
-                <amp-iframe height="400" width="250"
-                    layout="responsive"
-                    sandbox="allow-forms allow-pointer-lock allow-popups allow-same-origin allow-scripts allow-top-navigation allow-modals"
-                    resizable
-                    src="{{product.amp_options_url}}">{{! USE src="http://localhost:3030\{\{product.amp_options_url\}\}" FOR TESTING ON LOCALHOST }}
-                    <div class="button button--primary button--wide" overflow tabindex="0" role="button">Choose Options</div>
-                </amp-iframe>
-            {{else}}
-                <a class="button button--primary button--wide" role="button" href="{{product.cart_url}}?action=add&amp;product_id={{product.id}}">Add To Cart</a>
-            {{/if}}
+            <amp-iframe height="400" width="250"
+                layout="responsive"
+                sandbox="allow-forms allow-pointer-lock allow-popups allow-same-origin allow-scripts allow-top-navigation allow-modals"
+                resizable
+                src="{{product.amp_options_url}}">
+                <div class="button button--primary button--wide" overflow tabindex="0" role="button">Choose Options</div>
+            </amp-iframe>
         {{/or}}
         {{#if product.out_of_stock}}
             {{#if product.out_of_stock_message}}
@@ -59,37 +53,6 @@
                     {{{product.description}}}
                 </div>
             </section>
-        {{/if}}
-        {{#if product.custom_fields.length}}
-            {{#if theme_settings.productpage_custom_fields_tab}}
-                <section expanded class="productAccordion">
-                    <h4 class="productAccordion-title">{{lang 'products.addition'}}</h4>
-                    <div class="productAccordion-content addition">
-                        <table class="productView-addition-table table">
-                            <tbody class="table-tbody">
-                                {{#if theme_settings.productpage_custom_fields_hide_special}}
-                                    {{#each product.custom_fields}}
-                                        {{#startsWith '__' name}}
-                                        {{else}}
-                                            <tr>
-                                                <td><div class="productView-info-name productView-info-name--cf{{pascalcase name}}">{{name}}:</div></td>
-                                                <td><div class="productView-info-value productView-info-value--cf{{pascalcase name}}">{{{value}}}</div></td>
-                                            </tr>
-                                        {{/startsWith}}
-                                    {{/each}}
-                                {{else}}
-                                    {{#each product.custom_fields}}
-                                        <tr>
-                                            <td><div class="productView-info-name productView-info-name--cf{{pascalcase name}}">{{name}}:</div></td>
-                                            <td><div class="productView-info-value productView-info-value--cf{{pascalcase name}}">{{{value}}}</div></td>
-                                        </tr>
-                                    {{/each}}
-                                {{/if}}
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
-            {{/if}}
         {{/if}}
         {{#if product.videos.list.length}}
             {{> components/amp/products/videos product.videos}}

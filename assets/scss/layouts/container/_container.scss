@@ -14,8 +14,4 @@
     @include breakpoint("large") {
         padding: 0 ($container-padding * 4);
     }
-
-    .layout-fluid & {
-    	max-width: none;
-    }
 }

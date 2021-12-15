@@ -1,5 +1,3 @@
-import $ from 'jquery';
-
 export default class StencilDropdown {
     constructor(extendables) {
         this.extendables = extendables;
@@ -9,14 +7,14 @@ export default class StencilDropdown {
      * @param $dropDown
      * @param style
      */
-    hide($dropDown, event, style) {
+    hide($dropDown, style) {
         if (style) {
             $dropDown.attr('style', style);
         }
 
         // callback "hide"
         if (this.extendables && this.extendables.hide) {
-            this.extendables.hide(event);
+            this.extendables.hide();
         }
 
         $dropDown.removeClass('is-open f-open-dropdown').attr('aria-hidden', 'true');
@@ -38,21 +36,21 @@ export default class StencilDropdown {
     bind($dropDownTrigger, $container, style) {
         let modalOpened = false;
 
-        $dropDownTrigger.on('click', (event) => {
+        $dropDownTrigger.on('click', event => {
             const $cart = $('.is-open[data-cart-preview]');
 
             if ($cart) {
-                $cart.click();
+                $cart.trigger('click');
             }
 
             if ($container.hasClass('is-open')) {
-                this.hide($container, event, style);
+                this.hide($container, event);
             } else {
                 this.show($container, event, style);
             }
         });
 
-        $('body').click((e) => {
+        $('body').on('click', e => {
             // Call onClick handler
             if (this.extendables && this.extendables.onBodyClick) {
                 this.extendables.onBodyClick(e, $container);

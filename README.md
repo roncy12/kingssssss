@@ -1,14 +1,13 @@
-# Stencil
-[![Build Status](https://travis-ci.org/bigcommerce/stencil.svg?branch=master)](https://travis-ci.org/bigcommerce/stencil)
+# Cornerstone
+[![Build Status](https://travis-ci.org/bigcommerce/cornerstone.svg?branch=master)](https://travis-ci.org/bigcommerce/cornerstone)
 
-The building block for BigCommerce theme developers to get started quickly developing premium quality themes on the BigCommerce platform.
+Stencil's Cornerstone theme is the building block for BigCommerce theme developers to get started quickly developing premium quality themes on the BigCommerce platform.
 
 ### Stencil Utils
 [Stencil-utils](https://github.com/bigcommerce/stencil-utils) is our supporting library for our events and remote interactions.
 
 ## JS API
-When writing theme javascript there is an API in place for running javascript on a per page basis. To properly write JS for your theme, you will have the following
-page types available to you.
+When writing theme JavaScript (JS) there is an API in place for running JS on a per page basis. To properly write JS for your theme, the following page types are available to you:
 
 * "pages/account/addresses"
 * "pages/account/add-address"
@@ -19,6 +18,7 @@ page types available to you.
 * "pages/account/edit"
 * "pages/account/return-saved"
 * "pages/account/returns"
+* "pages/account/payment-methods"
 * "pages/auth/login"
 * "pages/auth/account-created"
 * "pages/auth/create-account"
@@ -42,94 +42,46 @@ page types available to you.
 * "pages/search"
 * "pages/sitemap"
 * "pages/subscribed"
-* "page/account/wishlist-details"
+* "pages/account/wishlist-details"
 * "pages/account/wishlists"
 
-And these page types will correspond to the pages within your theme. Each one of these page types map to an ES6 modules that extends the base `PageManager` abstract class.
-```javascript
-    export default class Auth extends PageManager {
-        constructor() {
-            //Set up code goes here, attach to internals and use internals as you would 'this'
-        }
-    }
-```
-Within `PageManager` you will see methods that are available from all your classes, but there are three really important methods. The following methods have the signature
-`func (callback)` and the callback takes `callback(err)` if error.
-
-#### before(callback)
-When this method is implemented in your class, the code contained will be executed after the constructor but before the `loaded()` method. This will provide
-a shim for your code before your main implementation logic could run.
-```javascript
-    export default class Auth extends PageManager {
-        constructor() {
-            //Set up code goes here
-        }
-        before(callback) {
-            //code that should be ran before any other code in this class
-
-            //Callback must be called to move on to the next method
-            callback();
-        }
-    }
-```
-#### loaded(callback)
-This method will be called when the constructor has ran and `before()` has executed. Main implementation code should live in the loaded method.
-```javascript
-    export default class Auth extends PageManager {
-        constructor() {
-            //Set up code goes here
-        }
-        loaded(callback) {
-            //Main implementation logic here
-
-            //Callback must be called to move on to the next method
-            callback();
-        }
-    }
-```
-
-#### after(callback)
-This method is for any cleanup that may need to happen and it will be executed after `before()` and `loaded()`.
+These page types will correspond to the pages within your theme. Each one of these page types map to an ES6 module that extends the base `PageManager` abstract class.
 
 ```javascript
     export default class Auth extends PageManager {
         constructor() {
-            //Set up code goes here
-        }
-        after(callback) {
-            //Main implementation logic here
-
-            //Callback must be called to move on to the next method
-            callback();
+            // Set up code goes here; attach to internals and use internals as you would 'this'
         }
     }
 ```
 
 ### JS Template Context Injection
-Occasionally you may need to use dynamic data from the template context within your clientside theme application code.
+Occasionally you may need to use dynamic data from the template context within your client-side theme application code.
 
 Two helpers are provided to help achieve this.
 
-The inject helper allows you to compose a json object with a subset of the template context to be sent to the browser.
+The inject helper allows you to compose a JSON object with a subset of the template context to be sent to the browser.
+
 ```
 {{inject "stringBasedKey" contextValue}}
 ```
 
-To retrieve the parsable json object, just call `{{jsContext}}` after all of the `{{@inject}}` calls.
+To retrieve the parsable JSON object, just call `{{jsContext}}` after all of the `{{@inject}}` calls.
 
-For example, to setup the product name in your clientside app, you can do this if you're in the context of a product.
+For example, to setup the product name in your client-side app, you can do the following if you're in the context of a product:
+
 ```html
 {{inject "myProductName" product.title}}
 
 <script>
 // Note the lack of quotes around the jsContext handlebars helper, it becomes a string automatically.
-var jsContext = JSON.parse({{jsContext}}); //jsContext would output "{\"myProductName\": \"Sample Product\"}" which can feed directly into your javascript
+var jsContext = JSON.parse({{jsContext}}); // jsContext would output "{\"myProductName\": \"Sample Product\"}" which can feed directly into your JavaScript
 
 console.log(jsContext.myProductName); // Will output: Sample Product
 </script>
 ```
 
-You can compose your json object across multiple pages to create a different set of clientside data depending on the currently loaded template context.
+You can compose your JSON object across multiple pages to create a different set of client-side data depending on the currently loaded template context.
 
 The stencil theme makes the jsContext available on both the active page scoped and global PageManager objects as `this.context`.
 
@@ -139,28 +91,36 @@ Some static assets in the Stencil theme are handled with Grunt if required. This
 means you have some dependencies on grunt and npm. To get started:
 
 First make sure you have Grunt installed globally on your machine:
+
 ```
 npm install -g grunt-cli
 ```
+
 and run:
+
 ```
 npm install
 ```
+
+Note: package-lock.json file was generated by Node version 8 and npm version 6.4.1. Although the app supports Node versions 6 and 8 as well as multiple versions of npm, we should always use those versions when updating package-lock.json, unless it is decided to upgrade those, and in this case the readme should be updated as well. If using a different version for node OR npm, please delete the package-lock.json file prior to installing node packages and also prior to pushing to github.
+
+If updating or adding a dependency, please double check that you are working on Node version 8 and npm version 6.4.1 and run ```npm update <package_name>```  or ```npm install <package_name>``` (avoid running npm install for updating a package). After updating the package, please make sure that the changes in the package-lock.json reflect only the updated/new package prior to pushing the changes to github.
+
 
 ### Icons
 Icons are delivered via a single SVG sprite, which is embedded on the page in
 `templates/layout/base.html`. It is generated via a grunt task `grunt svgstore`.
 
-The task takes individual SVG files for each icon, in `assets/icons` and bundles
-them together, to be inlined on the top of the theme, inside a handlebars partial.
-Each icon can then be called in a similar way to an inline image via:
+The task takes individual SVG files for each icon in `assets/icons` and bundles
+them together, to be inlined on the top of the theme, via an ajax call managed
+by svg-injector. Each icon can then be called in a similar way to an inline image via:
 
 ```
 <svg><use xlink:href="#icon-svgFileName" /></svg>
 ```
 
 The ID of the SVG icon you are calling is based on the filename of the icon you want,
-with `icon-` prepended. e.g. `xlink:href="#icon-fabeook"`.
+with `icon-` prepended. e.g. `xlink:href="#icon-facebook"`.
 
 Simply add your new icon SVG file to the icons folder, and run `grunt svgstore`,
 or just `grunt`.
@@ -168,7 +128,7 @@ or just `grunt`.
 #### License
 
 (The MIT License)
-Copyright (C) 2015-2016 BigCommerce Inc.
+Copyright (C) 2015-present BigCommerce Inc.
 All rights reserved.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -176,4 +136,3 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-

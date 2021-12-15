@@ -1,24 +1,27 @@
-import PageManager from '../page-manager';
-import $ from 'jquery';
+import PageManager from './page-manager';
+import _ from 'lodash';
 import nod from './common/nod';
 import Wishlist from './wishlist';
 import validation from './common/form-validation';
 import stateCountry from './common/state-country';
 import { classifyForm, Validators, insertStateHiddenField } from './common/form-utils';
+import { creditCardType, storeInstrument, Validators as CCValidators, Formatters as CCFormatters } from './common/payment-method';
+import swal from './global/sweet-alert';
 
 export default class Account extends PageManager {
-    constructor() {
-        super();
+    constructor(context) {
+        super(context);
 
         this.$state = $('[data-field-type="State"]');
         this.$body = $('body');
     }
 
-    loaded(next) {
+    onReady() {
         const $editAccountForm = classifyForm('form[data-edit-account-form]');
         const $addressForm = classifyForm('form[data-address-form]');
         const $inboxForm = classifyForm('form[data-inbox-form]');
         const $accountReturnForm = classifyForm('[data-account-return-form]');
+        const $paymentMethodForm = classifyForm('form[data-payment-method-form]');
         const $reorderForm = classifyForm('[data-account-reorder-form]');
         const $invoiceButton = $('[data-print-invoice]');
 
@@ -26,7 +29,7 @@ export default class Account extends PageManager {
         this.passwordRequirements = this.context.passwordRequirements;
 
         // Instantiates wish list JS
-        this.wishlist = new Wishlist();
+        Wishlist.load(this.context);
 
         if ($editAccountForm.length) {
             this.registerEditAccountValidation($editAccountForm);
@@ -37,9 +40,9 @@ export default class Account extends PageManager {
 
         if ($invoiceButton.length) {
             $invoiceButton.on('click', () => {
-                const left = screen.availWidth / 2 - 450;
-                const top = screen.availHeight / 2 - 320;
-                const url = $invoiceButton.data('print-invoice');
+                const left = window.screen.availWidth / 2 - 450;
+                const top = window.screen.availHeight / 2 - 320;
+                const url = $invoiceButton.data('printInvoice');
 
                 window.open(url, 'orderInvoice', `width=900,height=650,left=${left},top=${top},scrollbars=1`);
             });
@@ -61,30 +64,43 @@ export default class Account extends PageManager {
             this.initAccountReturnFormValidation($accountReturnForm);
         }
 
+        if ($paymentMethodForm.length) {
+            this.initPaymentMethodFormValidation($paymentMethodForm);
+        }
+
         if ($reorderForm.length) {
             this.initReorderForm($reorderForm);
         }
 
         this.bindDeleteAddress();
-
-        next();
+        this.bindDeletePaymentMethod();
     }
 
     /**
      * Binds a submit hook to ensure the customer receives a confirmation dialog before deleting an address
      */
     bindDeleteAddress() {
-        $('[data-delete-address]').on('submit', (event) => {
-            const message = $(event.currentTarget).data('delete-address');
+        $('[data-delete-address]').on('submit', event => {
+            const message = $(event.currentTarget).data('deleteAddress');
 
-            if (!confirm(message)) {
+            if (!window.confirm(message)) {
+                event.preventDefault();
+            }
+        });
+    }
+
+    bindDeletePaymentMethod() {
+        $('[data-delete-payment-method]').on('submit', event => {
+            const message = $(event.currentTarget).data('deletePaymentMethod');
+
+            if (!window.confirm(message)) {
                 event.preventDefault();
             }
         });
     }
 
     initReorderForm($reorderForm) {
-        $reorderForm.on('submit', (event) => {
+        $reorderForm.on('submit', event => {
             const $productReorderCheckboxes = $('.account-listItem .form-checkbox:checked');
             let submitForm = false;
 
@@ -105,7 +121,10 @@ export default class Account extends PageManager {
 
             if (!submitForm) {
                 event.preventDefault();
-                alert('Please select one or more items to reorder.');
+                swal.fire({
+                    text: this.context.selectItem,
+                    icon: 'error',
+                });
             }
         });
     }
@@ -148,7 +167,7 @@ export default class Account extends PageManager {
             });
         }
 
-        $addressForm.submit((event) => {
+        $addressForm.on('submit', event => {
             addressValidator.performCheck();
 
             if (addressValidator.areAll('valid')) {
@@ -160,9 +179,9 @@ export default class Account extends PageManager {
     }
 
     initAccountReturnFormValidation($accountReturnForm) {
-        const errorMessage = $accountReturnForm.data('account-return-form-error');
+        const errorMessage = $accountReturnForm.data('accountReturnFormError');
 
-        $accountReturnForm.submit((event) => {
+        $accountReturnForm.on('submit', event => {
             let formSubmit = false;
 
             // Iterate until we find a non-zero value in the dropdown for quantity
@@ -179,9 +198,113 @@ export default class Account extends PageManager {
                 return true;
             }
 
-            alert(errorMessage);
+            swal.fire({
+                text: errorMessage,
+                icon: 'error',
+            });
 
             return event.preventDefault();
+        });
+    }
+
+    initPaymentMethodFormValidation($paymentMethodForm) {
+        // Inject validations into form fields before validation runs
+        $paymentMethodForm.find('#first_name.form-field').attr('data-validation', `{ "type": "singleline", "label": "${this.context.firstNameLabel}", "required": true, "maxlength": 0 }`);
+        $paymentMethodForm.find('#last_name.form-field').attr('data-validation', `{ "type": "singleline", "label": "${this.context.lastNameLabel}", "required": true, "maxlength": 0 }`);
+        $paymentMethodForm.find('#company.form-field').attr('data-validation', `{ "type": "singleline", "label": "${this.context.companyLabel}", "required": false, "maxlength": 0 }`);
+        $paymentMethodForm.find('#phone.form-field').attr('data-validation', `{ "type": "singleline", "label": "${this.context.phoneLabel}", "required": false, "maxlength": 0 }`);
+        $paymentMethodForm.find('#address1.form-field').attr('data-validation', `{ "type": "singleline", "label": "${this.context.address1Label}", "required": true, "maxlength": 0 }`);
+        $paymentMethodForm.find('#address2.form-field').attr('data-validation', `{ "type": "singleline", "label": "${this.context.address2Label}", "required": false, "maxlength": 0 }`);
+        $paymentMethodForm.find('#city.form-field').attr('data-validation', `{ "type": "singleline", "label": "${this.context.cityLabel}", "required": true, "maxlength": 0 }`);
+        $paymentMethodForm.find('#country.form-field').attr('data-validation', `{ "type": "singleselect", "label": "${this.context.countryLabel}", "required": true, prefix: "${this.context.chooseCountryLabel}" }`);
+        $paymentMethodForm.find('#state.form-field').attr('data-validation', `{ "type": "singleline", "label": "${this.context.stateLabel}", "required": true, "maxlength": 0 }`);
+        $paymentMethodForm.find('#postal_code.form-field').attr('data-validation', `{ "type": "singleline", "label": "${this.context.postalCodeLabel}", "required": true, "maxlength": 0 }`);
+
+        const validationModel = validation($paymentMethodForm);
+        const paymentMethodSelector = 'form[data-payment-method-form]';
+        const paymentMethodValidator = nod({ submit: `${paymentMethodSelector} input[type="submit"]` });
+        const $stateElement = $(`${paymentMethodSelector} [data-field-type="State"]`);
+
+        let $last;
+        // Requests the states for a country with AJAX
+        stateCountry($stateElement, this.context, (err, field) => {
+            if (err) {
+                throw new Error(err);
+            }
+
+            const $field = $(field);
+
+            if (paymentMethodValidator.getStatus($stateElement) !== 'undefined') {
+                paymentMethodValidator.remove($stateElement);
+            }
+
+            if ($last) {
+                paymentMethodValidator.remove($last);
+            }
+
+            if ($field.is('select')) {
+                $last = field;
+                Validators.setStateCountryValidation(paymentMethodValidator, field);
+            } else {
+                Validators.cleanUpStateValidation(field);
+            }
+        });
+
+        // Use credit card number input listener to highlight credit card type
+        let cardType;
+        $(`${paymentMethodSelector} input[name="credit_card_number"]`).on('keyup', ({ target }) => {
+            cardType = creditCardType(target.value);
+            if (cardType) {
+                $(`${paymentMethodSelector} img[alt="${cardType}"]`).siblings().css('opacity', '.2');
+            } else {
+                $(`${paymentMethodSelector} img`).css('opacity', '1');
+            }
+        });
+
+        // Set of credit card validation
+        CCValidators.setCreditCardNumberValidation(paymentMethodValidator, `${paymentMethodSelector} input[name="credit_card_number"]`, this.context.creditCardNumber);
+        CCValidators.setExpirationValidation(paymentMethodValidator, `${paymentMethodSelector} input[name="expiration"]`, this.context.expiration);
+        CCValidators.setNameOnCardValidation(paymentMethodValidator, `${paymentMethodSelector} input[name="name_on_card"]`, this.context.nameOnCard);
+        CCValidators.setCvvValidation(paymentMethodValidator, `${paymentMethodSelector} input[name="cvv"]`, this.context.cvv, () => cardType);
+
+        // Set of credit card format
+        CCFormatters.setCreditCardNumberFormat(`${paymentMethodSelector} input[name="credit_card_number"]`);
+        CCFormatters.setExpirationFormat(`${paymentMethodSelector} input[name="expiration"]`);
+
+        // Billing address validation
+        paymentMethodValidator.add(validationModel);
+
+        $paymentMethodForm.on('submit', event => {
+            event.preventDefault();
+            // Perform final form validation
+            paymentMethodValidator.performCheck();
+            if (paymentMethodValidator.areAll('valid')) {
+                // Serialize form data and reduce it to object
+                const data = _.reduce($paymentMethodForm.serializeArray(), (obj, item) => {
+                    const refObj = obj;
+                    refObj[item.name] = item.value;
+                    return refObj;
+                }, {});
+
+                // Assign country and state code
+                const country = _.find(this.context.countries, ({ value }) => value === data.country);
+                const state = country && _.find(country.states, ({ value }) => value === data.state);
+                data.country_code = country ? country.code : data.country;
+                data.state_or_province_code = state ? state.code : data.state;
+
+                // Default Instrument
+                data.default_instrument = !!data.default_instrument;
+
+                // Store credit card
+                storeInstrument(this.context, data, () => {
+                    window.location.href = this.context.paymentMethodsUrl;
+                }, () => {
+                    swal.fire({
+                        text: this.context.generic_error,
+                        icon: 'error',
+                    });
+                });
+            }
         });
     }
 
@@ -216,7 +339,7 @@ export default class Account extends PageManager {
                 passwordSelector,
                 password2Selector,
                 this.passwordRequirements,
-                true
+                true,
             );
         }
 
@@ -232,7 +355,7 @@ export default class Account extends PageManager {
 
                     cb(result);
                 },
-                errorMessage: 'You must enter your current password.',
+                errorMessage: this.context.currentPassword,
             });
         }
 
@@ -244,7 +367,7 @@ export default class Account extends PageManager {
 
                     cb(result);
                 },
-                errorMessage: 'You must enter a first name.',
+                errorMessage: this.context.firstName,
             },
             {
                 selector: `${formEditSelector} input[name='account_lastname']`,
@@ -253,20 +376,11 @@ export default class Account extends PageManager {
 
                     cb(result);
                 },
-                errorMessage: 'You must enter a last name.',
-            },
-            {
-                selector: `${formEditSelector} input[name='account_phone']`,
-                validate: (cb, val) => {
-                    const result = val.length;
-
-                    cb(result);
-                },
-                errorMessage: 'You must enter a phone number.',
+                errorMessage: this.context.lastName,
             },
         ]);
 
-        $editAccountForm.submit((event) => {
+        $editAccountForm.on('submit', event => {
             editValidator.performCheck();
 
             if (editValidator.areAll('valid')) {
@@ -290,7 +404,7 @@ export default class Account extends PageManager {
 
                     cb(result);
                 },
-                errorMessage: 'You must select an order.',
+                errorMessage: this.context.enterOrderNum,
             },
             {
                 selector: 'form[data-inbox-form] input[name="message_subject"]',
@@ -299,7 +413,7 @@ export default class Account extends PageManager {
 
                     cb(result);
                 },
-                errorMessage: 'You must enter a subject.',
+                errorMessage: this.context.enterSubject,
             },
             {
                 selector: 'form[data-inbox-form] textarea[name="message_content"]',
@@ -308,11 +422,11 @@ export default class Account extends PageManager {
 
                     cb(result);
                 },
-                errorMessage: 'You must enter a message.',
+                errorMessage: this.context.enterMessage,
             },
         ]);
 
-        $inboxForm.submit((event) => {
+        $inboxForm.on('submit', event => {
             inboxValidator.performCheck();
 
             if (inboxValidator.areAll('valid')) {

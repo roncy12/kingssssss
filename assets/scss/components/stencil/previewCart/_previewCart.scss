@@ -27,7 +27,7 @@
         .productView-image--cart {
             align-self: flex-start;
             margin: 0 auto;
-            width: auto;
+            width: 100%;
         }
 
         .productView-details {
@@ -81,6 +81,18 @@
         // scss-lint:disable ImportantRule
         float: none !important; // 1
         margin: spacing("third") 0;
+    }
+
+    .CheckoutButton {
+        margin-bottom: spacing("base");
+
+        &:first-child {
+            margin-top: spacing("single");
+        }
+
+        &:last-child {
+            margin-bottom: spacing("single");
+        }
     }
 }
 

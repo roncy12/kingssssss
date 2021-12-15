@@ -1,22 +1,23 @@
-<div class="form-field cb" data-product-attribute="input-checkbox">
-    <label class="form-label form-label--alternate form-label--inlineSmall checkbox-label">
-        {{display_name}}
+<div class="form-field" data-product-attribute="input-checkbox">
+    <label class="form-label form-label--alternate form-label--inlineSmall">
+        {{display_name}}:
 
         {{#if required}}
-            <small class="emthemesModez-requiredMark">{{lang 'common.required'}}</small>
+            <small>{{lang 'common.required'}}</small>
         {{/if}}
-
-        {{> components/emthemes-modez/products/field-guide}}
     </label>
-
-    <input 
+    <input type="hidden" name="attribute[{{id}}]" value="{{noValue}}" />
+    <input
         class="form-checkbox"
         type="checkbox"
         name="attribute[{{id}}]"
-        id="attribute-{{id}}_{{../id}}"
+        id="attribute-check-{{id}}"
         value="{{value}}"
-        {{#if checked}}checked{{/if}}
+        {{#if checked}}
+            checked
+            data-default
+        {{/if}}
         {{#if required}}required{{/if}}>
 
-    <label class="form-label {{class}}" for="attribute-{{id}}_{{../id}}">{{label}}</label>
+    <label class="form-label {{class}}" for="attribute-check-{{id}}">{{label}}</label>
 </div>

@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import _ from 'lodash';
 import utils from '@bigcommerce/stencil-utils';
 import StencilDropDown from './stencil-dropdown';
@@ -60,49 +59,5 @@ export default function () {
         }
 
         return true;
-    });
-
-    // Papathemes: visible quick search MOD
-    $quickSearchDiv.on('click', '[data-quick-search-link]', event => {
-        event.preventDefault();
-
-        $('[data-search="quickSearch"] form').each((i, form) => {
-            const $form = $(form);
-            const searchQuery = $form.find('input').val();
-            if (searchQuery.length > 0) {
-                $form.submit();
-                return false;
-            }
-        });
-    });
-
-    const $mobileQuickSearchDiv = $('[data-search="mobileQuickSearch"]');
-
-    $mobileQuickSearchDiv.on('click', '[data-quick-search-link]', event => {
-        event.preventDefault();
-
-        $('form', $mobileQuickSearchDiv).each((i, form) => {
-            const $form = $(form);
-            const searchQuery = $form.find('input').val();
-            if (searchQuery.length > 0) {
-                $form.submit();
-                return false;
-            }
-        });
-    });
-
-    utils.hooks.on('search-quick', event => {
-        const searchQuery = $(event.currentTarget).val();
-        if (searchQuery.length < 3) {
-            $quickSearchResults.html('');
-            return;
-        }
-    });
-
-    $('body').on('click', event => {
-        if ($(event.target).closest('.quickSearchResults, [data-search-quick]').length === 0) {
-            $quickSearchResults.html('');
-            $('[data-search-quick]').val('');
-        }
     });
 }

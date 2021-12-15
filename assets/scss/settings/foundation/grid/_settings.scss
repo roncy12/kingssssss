@@ -21,7 +21,6 @@ $include-xl-html-grid-classes:  false;
 
 $row-width:                     layout("max");
 $total-columns:                 12;
-// $column-gutter:                 spacing("single"); // emthemesModez mods
-$column-gutter:                 spacing("single") + spacing("half");
+$column-gutter:                 spacing("single");
 
 $last-child-float:              $opposite-direction;

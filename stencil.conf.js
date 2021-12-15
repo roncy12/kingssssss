@@ -1,14 +1,4 @@
-var Path = require('path');
 var webpack = require('webpack');
-var webpackConfig = require('./webpack.conf.js');
-var bundleLocation = 'assets/js/bundle.js';
-
-webpackConfig.context = __dirname;
-webpackConfig.entry = './assets/js/app.js';
-webpackConfig.output = {
-    path: __dirname + '/assets/js',
-    filename: 'bundle.js'
-};
 
 /**
  * Watch options for the core watcher
@@ -18,7 +8,7 @@ var watchOptions = {
     // If files in these directories change, reload the page.
     files: [
         '/templates',
-        '/lang'
+        '/lang',
     ],
 
     //Do not watch files in these directories
@@ -26,60 +16,74 @@ var watchOptions = {
         '/assets/scss',
         '/assets/less',
         '/assets/css',
+        '/assets/dist',
     ]
 };
 
 /**
- * Hook into the stencil-cli browsersync instance for rapid development of themes.
  * Watch any custom files and trigger a rebuild
- * @param {Object} Bs
  */
-function development(Bs) {
-    var compiler = webpack(webpackConfig);
+function development() {
+    var devConfig = require('./webpack.dev.js');
 
     // Rebuild the bundle once at bootup
-    compiler.watch({}, function(err, stats) {
+    webpack(devConfig).watch({}, (err, stats) => {
         if (err) {
-            console.error(err)
+            console.error(err.message, err.details);
         }
 
-        Bs.reload();
+        if (stats.hasErrors()) {
+            console.error(stats.toString({ all: false, errors: true, colors: true }));
+        }
+
+        if (stats.hasWarnings()) {
+            console.error(stats.toString({ all: false, warnings: true, colors: true }));
+        }
+
+        process.send('reload');
     });
 }
 
-/**
-
-*/
 /**
  * Hook into the `stencil bundle` command and build your files before they are packaged as a .zip
- * Be sure to call the `done()` callback when finished
- * @param {function} done
  */
-function production(done) {
-    var compiler;
+function production() {
+    var prodConfig = require('./webpack.prod.js');
 
-    webpackConfig.devtool = false;
-    webpackConfig.plugins.push(new webpack.optimize.DedupePlugin());
-    webpackConfig.plugins.push(new webpack.optimize.UglifyJsPlugin({
-        comments: false
-    }));
-
-    compiler = webpack(webpackConfig);
-
-    compiler.run(function(err, stats) {
+    webpack(prodConfig).run((err, stats) => {
         if (err) {
-            throw err;
+            console.error(err.message, err.details);
+            process.exit(1);
+            return;
         }
 
-        done();
+        if (stats.hasErrors()) {
+            console.error(stats.toString({ all: false, errors: true, colors: true }));
+            process.exit(1);
+            return;
+        }
+
+        if (stats.hasWarnings()) {
+            console.error(stats.toString({ all: false, warnings: true, colors: true }));
+        }
+
+        process.send('done');
     });
 }
 
-module.exports = {
-    watchOptions: watchOptions,
-    development: development,
-    production: production,
-};
+if (process.send) {
+    // running as a forked worker
+    process.on('message', message => {
+        if (message === 'development') {
+            development();
+        }
 
+        if (message === 'production') {
+            production();
+        }
+    });
 
+    process.send('ready');
+}
 
+module.exports = { watchOptions };

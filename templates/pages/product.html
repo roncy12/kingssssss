@@ -10,64 +10,53 @@ product:
         limit: {{theme_settings.productpage_similar_by_views_count}}
 ---
 {{#partial "page"}}
-<script src="https://kit.fontawesome.com/46efe1203f.js" crossorigin="anonymous"></script>
     {{> components/common/breadcrumbs breadcrumbs=breadcrumbs}}
 
-<!--
     {{#each product.shipping_messages}}
         {{> components/common/alert-info message}}
     {{/each}}
--->
 
-    <div itemscope itemtype="http://schema.org/Product" id="desktop-view-product-page">
-        {{> components/products/product-view schema=true}}
+    <div itemscope itemtype="http://schema.org/Product">
+        {{> components/products/product-view schema=true  }}
+        <div id="flix-inpage"></div>
+        {{{region name="product_below_content"}}}
 
-        <!--{{> components/products/videos product.videos}}-->
+        {{#if product.videos.list.length}}
+            {{> components/products/videos product.videos}}
+        {{/if}}
+
+        {{#all settings.show_product_reviews (if theme_settings.show_product_reviews_tabs '!==' true)}}
+            {{> components/products/reviews reviews=product.reviews product=product urls=urls}}
+        {{/all}}
 
         {{> components/products/tabs}}
-        <!--
-        <div class="yotpo yotpo-main-widget" 
-            data-product-id="{{ product.id }}"
-            data-price="{{ product.price.without_tax.value }}"
-            data-currency="{{ currency_selector.active_currency_code }}" 
-            data-name="{{ product.title }}" 
-            data-url="{{ product.url }}" 
-            data-image-url="{{getImage product.main_image}}" 
-            data-description="{{ product.description }}"> 
-        </div>
-        --> 
-
     </div>
-
 {{/partial}}
-
 {{> layout/product-base}}
 
-<script type="text/javascript"> 
-var _learnq = _learnq || []; 
+<script>
+    //remove Other Color(s) wording in main product page if no other color
 
- var item = {
-   Name: "{{product.title}}", 
-   ProductID: "{{product.id}}",
-   ImageURL: "{{getImage product.main_image 'product_size' (cdn theme_settings.default_image_product)}}", 
-   URL: "{{product.url}}",
-   Brand: "{{product.brand.name}}", 
-   Price: "{{product.price.without_tax.value}}",
-   CompareAtPrice: "{{product.price.rrp_without_tax.value}}"
-  };
+   if( $('.color-option-container .option-container-flex').children().length > 0 ){
+        //no children
+    }else{
+        $('.color-option-container').remove();
+    }
+    
 
-_learnq.push(['track', 'Viewed Product', item]); 
-
-_learnq.push(['trackViewedItem', {
-   Title: item.Name, 
-   ItemId: item.ProductID,
-   ImageUrl: item.ImageURL, 
-   Url: item.URL,
-
-   Metadata: { 
-     Brand: item.Brand,
-     Price: item.Price, 
-     CompareAtPrice: item.CompareAtPrice
- } 
- }]);
 </script>
+
+
+
+<script type="text/javascript" src="//media.flixfacts.com/js/loader.js"
+data-flix-distributor="17923"
+data-flix-language="us"
+data-flix-brand=""
+data-flix-mpn="{{product.sku}}"
+data-flix-ean=""
+data-flix-sku=""
+data-flix-button="flix-minisite"
+data-flix-inpage="flix-inpage"
+data-flix-button-image=""
+data-flix-price=""
+data-flix-fallback-language="" async></script>

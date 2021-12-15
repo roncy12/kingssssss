@@ -3,10 +3,8 @@
         {{this.display_name}}:
 
         {{#if required}}
-            <small class="emthemesModez-requiredMark">{{lang 'common.required'}}</small>
+            <small>{{lang 'common.required'}}</small>
         {{/if}}
-
-        {{> components/emthemes-modez/products/field-guide}}
     </label>
     <select class="form-select form-select--date" name="attribute[{{this.id}}][month]" {{#if required}}required{{/if}}>
         <option value="">{{lang 'common.month'}}</option>
@@ -31,5 +29,8 @@
                 {{$index}}
             </option>
         {{/for}}
+        {{#if earliest_year '==' latest_year}}
+        <option value="{{earliest_year}}" selected="selected">{{earliest_year}}</option>
+        {{/if}}
     </select>
 </div>

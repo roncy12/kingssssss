@@ -1,3 +1,4 @@
+
 // =============================================================================
 // STENCIL
 // =============================================================================
@@ -45,14 +46,11 @@
 @import "settings/stencil/stencil"; // 4
 @import "settings/layouts/layouts"; // 4
 
-@import "settings/emthemesModez/emthemesModez";
-
 
 // Utilities
 // -----------------------------------------------------------------------------
 
 @import "utilities/utilities";
-@import "utilities/utilities-emthemesModez";
 @import "../../node_modules/@bigcommerce/citadel/dist/utilities/utilities";
 
 
@@ -60,10 +58,6 @@
 // -----------------------------------------------------------------------------
 
 @import "fonts/fonts";
-
-// emthemes-modez added 3rd-party icons
-@import "../../node_modules/font-awesome/scss/font-awesome";
-@import "../../node_modules/simple-line-icons/scss/simple-line-icons";
 
 
 // Components
@@ -91,8 +85,20 @@
 
 @import "vendor/jstree/style";
 
-@import "theme-custom"; // emthemesModez
+@import "custom";
 
-@import "aoc-custom.scss";
+@import "animation";
 
-@import "aoc-mobile.scss";
+@import "category";
+
+@import "product-page";
+
+@import "responsive";
+
+* {
+    font-family: 'Roboto', sans-serif;
+}
+
+html {
+    overflow-x: hidden;
+}

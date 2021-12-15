@@ -1,4 +1,3 @@
-<!--
 <div class="facetedSearch-refineFilters sidebarBlock">
     <h5 class="sidebarBlock-heading">
         {{lang 'search.faceted.selected.title'}}
@@ -16,7 +15,7 @@
                         {{#if facet '===' 'rating'}}
                             {{lang 'search.faceted.selected.rating-label' rating=title}}
                         {{else}}
-                            {{ title }}
+                            {{{ sanitize title }}}
                         {{/if}}
 
                         <svg class="icon">
@@ -36,4 +35,3 @@
         </a>
     {{/if}}
 </div>
--->

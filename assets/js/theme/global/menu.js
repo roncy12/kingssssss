@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import collapsibleFactory from '../common/collapsible';
 import collapsibleGroupFactory from '../common/collapsible-group';
 
@@ -12,9 +11,7 @@ class Menu {
     constructor($menu) {
         this.$menu = $menu;
         this.$body = $('body');
-
-        // paralbag
-        this.allowCollapse = true;
+        this.hasMaxMenuDisplayDepth = this.$body.find('.navPages-list').hasClass('navPages-list-depth-max');
 
         // Init collapsible
         this.collapsibles = collapsibleFactory('[data-collapsible]', { $context: this.$menu });
@@ -29,7 +26,14 @@ class Menu {
     }
 
     collapseAll() {
+        this.collapsibles.forEach(collapsible => collapsible.close());
         this.collapsibleGroups.forEach(group => group.close());
+    }
+
+    collapseNeighbors($neighbors) {
+        const $collapsibles = collapsibleFactory('[data-collapsible]', { $context: $neighbors });
+
+        $collapsibles.forEach($collapsible => $collapsible.close());
     }
 
     bindEvents() {
@@ -42,21 +46,18 @@ class Menu {
         this.$body.off('click', this.onDocumentClick);
     }
 
-    onMenuClick() {
-        // event.stopPropagation(); // paralbag
+    onMenuClick(event) {
+        event.stopPropagation();
 
-        // paralbag
-        this.allowCollapse = false;
+        if (this.hasMaxMenuDisplayDepth) {
+            const $neighbors = $(event.target).parent().siblings();
+
+            this.collapseNeighbors($neighbors);
+        }
     }
 
     onDocumentClick() {
-        // this.collapseAll(); // paralbag
-
-        // paralbag
-        if (this.allowCollapse) {
-            this.collapseAll();
-        }
-        this.allowCollapse = true;
+        this.collapseAll();
     }
 }
 
@@ -67,7 +68,7 @@ class Menu {
  */
 export default function menuFactory(selector = `[data-${PLUGIN_KEY}]`) {
     const $menu = $(selector).eq(0);
-    const instanceKey = `${PLUGIN_KEY}-instance`;
+    const instanceKey = `${PLUGIN_KEY}Instance`;
     const cachedMenu = $menu.data(instanceKey);
 
     if (cachedMenu instanceof Menu) {

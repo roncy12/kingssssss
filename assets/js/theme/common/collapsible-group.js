@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import { CollapsibleEvents } from '../common/collapsible';
 
 const PLUGIN_KEY = 'collapsible-group';
@@ -65,7 +64,7 @@ export class CollapsibleGroup {
  */
 export default function collapsibleGroupFactory(selector = `[data-${PLUGIN_KEY}]`, options = {}) {
     const $groups = $(selector, options.$context);
-    const instanceKey = `${PLUGIN_KEY}-instance`;
+    const instanceKey = `${PLUGIN_KEY}Instance`;
 
     return $groups.map((index, element) => {
         const $group = $(element);

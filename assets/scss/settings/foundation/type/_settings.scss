@@ -80,13 +80,11 @@ $header-font-family:            stencilFontFamily("headings-font"), Arial, Helve
 $header-font-weight:            stencilFontWeight("headings-font");
 $header-font-style:             null;
 $header-font-color:             stencilColor("color-textHeading");
-// $header-line-height:            null;
-$header-line-height:            1.25; // papaParallaxBag mods
+$header-line-height:            null;
 $header-top-margin:             spacing("double");
 $header-bottom-margin:          spacing("half");
 $header-text-rendering:         null;
-// $header-letter-spacing:         letterSpacing("small"); // emthemesModez mods
-$header-letter-spacing:         letterSpacing("large");
+$header-letter-spacing:         letterSpacing("small");
 
 // We use these to control header font sizes
 $h1-font-size:                  fontSize("largest");

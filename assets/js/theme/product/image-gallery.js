@@ -1,52 +1,33 @@
-// ============================================================================
-// PAPATHEMES SARAHMARKET CUSTOMIZATION:
-// - Using slick carousel for image thumbnails.
-// - Using baguetteBox for image lightbox.
-// ============================================================================
-
-import $ from 'jquery';
-import 'jquery-zoom';
+import 'easyzoom';
 import _ from 'lodash';
-import 'slick-carousel';
-import baguetteBox from 'baguettebox.js';
-import imagesLoaded from 'imagesloaded';
-
-imagesLoaded.makeJQueryPlugin($);
 
 export default class ImageGallery {
     constructor($gallery) {
-        this.$mainCarousel = $gallery.find('[data-image-gallery-main]');
-        this.$navCarousel = $gallery.find('[data-image-gallery-nav]');
-
-        const $defSlide = this.$mainCarousel.find('.slick-current');
-        const defSlideIdx = $defSlide.parent().children().index($defSlide);
-
-        this.defaultSlideIndex = defSlideIdx;
-
-        const uid = _.uniqueId();
-
-        if (this.$mainCarousel.attr('id') === '') {
-            this.$mainCarousel.attr('id', `imageGalleryMainCarousel${uid}`);
-        }
-
-        if (this.$navCarousel.attr('id') === '') {
-            this.$navCarousel.attr('id', `imageGalleryNavCarousel${uid}`);
-        }
+        this.$mainImage = $gallery.find('[data-image-gallery-main]');
+        this.$selectableImages = $gallery.find('[data-image-gallery-item]');
+        this.currentImage = {};
     }
 
     init() {
         this.bindEvents();
+        this.setImageZoom();
     }
 
     setMainImage(imgObj) {
         this.currentImage = _.clone(imgObj);
 
+        this.setActiveThumb();
         this.swapMainImage();
     }
 
     setAlternateImage(imgObj) {
         if (!this.savedImage) {
-            this.savedImage = _.clone(this.currentImage);
+            this.savedImage = {
+                mainImageUrl: this.$mainImage.find('img').attr('src'),
+                zoomImageUrl: this.$mainImage.attr('data-zoom-image'),
+                mainImageSrcset: this.$mainImage.find('img').attr('srcset'),
+                $selectedThumb: this.currentImage.$selectedThumb,
+            };
         }
         this.setMainImage(imgObj);
     }
@@ -58,89 +39,57 @@ export default class ImageGallery {
         }
     }
 
+    selectNewImage(e) {
+        e.preventDefault();
+        const $target = $(e.currentTarget);
+        const imgObj = {
+            mainImageUrl: $target.attr('data-image-gallery-new-image-url'),
+            zoomImageUrl: $target.attr('data-image-gallery-zoom-image-url'),
+            mainImageSrcset: $target.attr('data-image-gallery-new-image-srcset'),
+            $selectedThumb: $target,
+        };
+
+        this.setMainImage(imgObj);
+    }
+
     setActiveThumb() {
-        const i = this.$mainCarousel.slick('slickCurrentSlide');
-        this.$navCarousel
-            .find('.slick-slide')
-            .removeClass('slick-current')
-            .eq(i)
-            .addClass('slick-current');
+        this.$selectableImages.removeClass('is-active');
+        if (this.currentImage.$selectedThumb) {
+            this.currentImage.$selectedThumb.addClass('is-active');
+        }
     }
 
     swapMainImage() {
-        try {
-            this.$mainCarousel.slick('slickGoTo', this.defaultSlideIndex);
-        } catch (e) {
-            // ignore
+        this.easyzoom.data('easyZoom').swap(
+            this.currentImage.mainImageUrl,
+            this.currentImage.zoomImageUrl,
+            this.currentImage.mainImageSrcset,
+        );
+
+        this.$mainImage.attr({
+            'data-zoom-image': this.currentImage.zoomImageUrl,
+        });
+    }
+
+    checkImage() {
+        const containerHeight = $('.productView-image').height();
+        const containerWidth = $('.productView-image').width();
+        const height = this.easyzoom.data('easyZoom').$zoom.context.height;
+        const width = this.easyzoom.data('easyZoom').$zoom.context.width;
+        if (height < containerHeight || width < containerWidth) {
+            this.easyzoom.data('easyZoom').hide();
         }
-        this.$mainCarousel.find(`.slick-slide:eq(${this.defaultSlideIndex}) img`).attr('src', this.currentImage.mainImageUrl);
-        this.$mainCarousel.find(`.slick-slide:eq(${this.defaultSlideIndex}) a`).attr('href', this.currentImage.zoomImageUrl);
-        this.$navCarousel.find(`.productView-imageCarousel-nav-item:eq(${this.defaultSlideIndex}) img`).attr('src', this.currentImage.mainImageUrl);
-        baguetteBox.run(`#${this.$mainCarousel.attr('id')}`);
+    }
+
+    setImageZoom() {
+        this.easyzoom = this.$mainImage.easyZoom({
+            onShow: () => this.checkImage(),
+            errorNotice: '',
+            loadingNotice: '',
+        });
     }
 
     bindEvents() {
-        this.$mainCarousel
-            .slick({
-                slidesToShow: 1,
-                slidesToScroll: 1,
-                infinite: false,
-                initialSlide: this.defaultSlideIndex,
-                asNavFor: `#${this.$navCarousel.attr('id')}`,
-                arrows: false,
-            })
-            .on('afterChange', () => {
-                this.setActiveThumb();
-            });
-
-        this.$navCarousel
-            .imagesLoaded(() => {
-                if (this.$navCarousel.data('imageGalleryNavHorizontal')) {
-                    this.$navCarousel.slick({
-                        slidesToShow: 5,
-                        slidesToScroll: 1,
-                        infinite: false,
-                        initialSlide: this.defaultSlideIndex,
-                        asNavFor: `#${this.$mainCarousel.attr('id')}`,
-                        arrows: true,
-                        focusOnSelect: true,
-                        centerPadding: 0,
-                        adaptiveHeight: true,
-                        responsive: [{
-                            breakpoint: 550,
-                            settings: {
-                                arrows: false,
-                            },
-                        }],
-                    });
-                } else {
-                    this.$navCarousel.slick({
-                        slidesToShow: 4,
-                        slidesToScroll: 1,
-                        infinite: false,
-                        // initialSlide: this.defaultSlideIndex, // occur bug when set!!!
-                        asNavFor: `#${this.$mainCarousel.attr('id')}`,
-                        arrows: true,
-                        vertical: true,
-                        verticalSwiping: true,
-                        focusOnSelect: true,
-                        centerPadding: 0,
-                        adaptiveHeight: true,
-                        responsive: [
-                            {
-                                breakpoint: 550,
-                                settings: {
-                                    vertical: false,
-                                    verticalSwiping: false,
-                                    slidesToShow: 4,
-                                    arrows: false,
-                                },
-                            },
-                        ],
-                    });
-                }
-            });
-
-        baguetteBox.run(`#${this.$mainCarousel.attr('id')}`);
+        this.$selectableImages.on('click', this.selectNewImage.bind(this));
     }
 }

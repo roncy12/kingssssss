@@ -1,11 +1,10 @@
-import $ from 'jquery';
 import _ from 'lodash';
 
 export default class TextTruncate {
     constructor($element) {
         this.$element = $element;
         this.contentClass = 'textTruncate--visible';
-        this.options = $element.data('text-truncate') || {
+        this.options = $element.data('textTruncate') || {
             css: {},
             text: {
                 viewMore: '',
@@ -44,7 +43,7 @@ export default class TextTruncate {
 
     bindAnchor() {
         // bind anchor to this scope
-        this.$viewAnchor.on('click', (e) => {
+        this.$viewAnchor.on('click', e => {
             e.preventDefault();
             // toggle state
             this.toggleState();

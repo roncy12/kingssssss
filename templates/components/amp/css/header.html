@@ -14,7 +14,7 @@
 }
 
 .amp-header {
-    background-color: {{theme_settings.header-backgroundColor}};
+    background-color: #fff;
     border-bottom: 1px solid #e8e8e8;
     position: fixed;
     top: 0;
@@ -23,7 +23,6 @@
     z-index: 20;
     display: flex;
     align-items: center;
-    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
 }
 
 .amp-header-link {
@@ -35,13 +34,6 @@
     flex-grow: 1;
     padding-right: 3.92857rem;
     text-align: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.amp-header-logo img {
-    object-fit: contain;
 }
 
 .amp-empty-space {
@@ -50,47 +42,17 @@
 
 .amp-header-logo-text {
     display: block;
-    font-family: "Roboto", Arial, Helvetica, sans-serif;
-    font-size: 16px;
-    font-weight: 700;
-    letter-spacing: 0;
+    font-family: "Montserrat", Arial, Helvetica, sans-serif;
+    font-size: 20px;
+    font-weight: 300;
+    letter-spacing: .15714rem;
     margin-left: auto;
     margin-right: auto;
     overflow: hidden;
-    padding: 0.21429rem 0;
+    padding: .21429rem 0;
     text-overflow: ellipsis;
     text-transform: uppercase;
-    white-space: nowrap;
-    color: {{theme_settings.storeName-color}};
-}
-
-.amp-quickSearch {
-    padding: 0.78571rem 1.14286rem;
-}
-
-.amp-quickSearch .form-input {
-    width: 100%;
-    padding: 0.35714rem 0.78571rem;
-    height: 2.21429rem;
-}
-
-.amp-quickSearch .form-field {
-    position: relative;
-}
-
-.amp-quickSearch .form-field:before {
-    content: '';
-    display: block;
-    background-color: transparent;
-    background-image: url('data:image/svg+xml;utf8,<svg enable-background="new 0 0 128 128" height="128px" id="Layer_1" version="1.1" viewBox="0 0 128 128" width="128px" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g id="search"><path d="M115.613,105.593L91.421,81.401c5.06-7.278,8.035-16.115,8.035-25.651c0-24.853-20.147-45-45-45   s-45,20.147-45,45s20.147,45,45,45c9.536,0,18.373-2.975,25.651-8.035l24.192,24.192c1.562,1.562,3.609,2.343,5.657,2.343   s4.095-0.781,5.657-2.343C118.737,113.782,118.737,108.718,115.613,105.593z M17.456,55.75c0-20.402,16.598-37,37-37   s37,16.598,37,37s-16.598,37-37,37S17.456,76.152,17.456,55.75z" fill="#454545"/></g></svg>');
-    background-repeat: no-repeat;
-    background-size: 1.5rem 1.5rem;
-    background-position: center center;
-    width: 2.21429rem;
-    height: 2.21429rem;
-    position: absolute;
-    top: 0;
-    right: 0.382855rem;
+    white-space: nowrap
 }
 
 .banners {

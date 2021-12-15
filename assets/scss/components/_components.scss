@@ -9,11 +9,12 @@
 // Slick carousel
 @import "vendor/slick/component";
 
-// Pace Ajax loading progress bar
-@import "vendor/pace/component";
+// Nanobar Ajax loading progress bar
+@import "vendor/nanobar/component";
 
-// baguetteBox (lightbox) added by papaSupermarket
-@import "vendor/baguettebox/component";
+// SweetAlert2 replacement for JavaScript alert/confirmations
+@import "vendor/sweetalert2/component";
+
 
 // Foundation components
 // -----------------------------------------------------------------------------
@@ -60,6 +61,9 @@
 // Alerts
 @import "foundation/alerts/component";
 
+// Lazy Load
+@import "foundation/lazyLoad/component";
+
 
 // Citadel components
 // -----------------------------------------------------------------------------
@@ -72,7 +76,6 @@
 
 // Nav
 @import "citadel/nav/nav";
-@import "citadel/nav/nav-emthemesModez";
 
 // Overlay
 @import "citadel/loading/component";
@@ -183,34 +186,8 @@
 // Apple Pay
 @import "stencil/applePay/component";
 
+// Payment Methods
+@import "stencil/paymentMethods/component";
 
-
-// emthemesModez components
-// -----------------------------------------------------------------------------
-
-// Banners
-@import "emthemesModez/banners/component";
-
-// Newsletter Form section
-@import "emthemesModez/newsletterSection/component";
-
-// Products with categories aside section
-@import "emthemesModez/products/component";
-
-// Instagram
-@import "emthemesModez/instagram/component";
-
-// Sections
-@import "emthemesModez/sections/component";
-
-// Common
-@import "emthemesModez/common/component";
-
-// Category
-@import "emthemesModez/category/component";
-
-// papaParallaxBag components
-// -----------------------------------------------------------------------------
-
-// Sections
-@import "papaParallaxBag/sections/component";
+// Categories
+@import "stencil/category/component";

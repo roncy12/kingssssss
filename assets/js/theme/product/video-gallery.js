@@ -1,5 +1,3 @@
-import $ from 'jquery';
-
 export class VideoGallery {
     constructor($element) {
         this.$player = $element.find('[data-video-player]');
@@ -14,7 +12,7 @@ export class VideoGallery {
         const $target = $(e.currentTarget);
 
         this.currentVideo = {
-            id: $target.data('video-id'),
+            id: $target.data('videoId'),
             $selectedThumb: $target,
         };
 

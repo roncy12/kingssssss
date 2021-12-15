@@ -1,56 +1,20 @@
 {{#partial "head"}}
 {{{ checkout.checkout_head }}}
 {{{ stylesheet '/assets/css/optimized-checkout.css' }}}
-{{{ stylesheet '/assets/css/checkout-print.css' media="print"}}}
 {{ getFontsCollection }}
 
 <script type="text/javascript">
     window.language = {{{langJson 'optimized_checkout'}}};
 </script>
-<script data-adroll="bigcommerce-adroll-pixel" type="text/javascript">
-    adroll_adv_id = "CGMMXOIQNFEJNJ4OHDHSNI";
-    adroll_pix_id = "336PHW4JGFBDHJ3TM2BPWH";
-    adroll_order_id = "";
-    adroll_version = "2.0";
-    (function(w,d,e,o,a){
-        w.__adroll_loaded=true;
-        w.adroll=w.adroll||[];
-        w.adroll.f=['setProperties','identify','track'];
-        var roundtripUrl="https://s.adroll.com/j/" + adroll_adv_id + "/roundtrip.js";
-        for(a=0;a<w.adroll.f.length;a++){
-            w.adroll[w.adroll.f[a]]=w.adroll[w.adroll.f[a]]||(function(n){return function(){w.adroll.push([n,arguments])}})(w.adroll.f[a])};e=d.createElement('script');o=d.getElementsByTagName('script')[0];e.async=1;e.src=roundtripUrl;o.parentNode.insertBefore(e, o);})(window,document);
-    console.log('AdRoll track event: pageView');
-    adroll.track('pageView');
-</script>
-<style>
-    @media print {
-        .layout {
-            padding-bottom: 0;
-        }
-        .checkoutHeader {
-            min-height: auto;
-            -webkit-print-color-adjust: exact;
-            color-adjust: exact;
-        }
-        .checkoutHeader-content {
-            padding-top: 1rem;
-            padding-bottom: 1rem;
-        }
-        .cart {
-            display: block
-        }
-        .cartDrawer {
-            display: none;
-        }
-        .layout-cart {
-            page-break-before: auto;
-        }
-    }
-</style>
+
+{{{head.scripts}}}
 
 {{/partial}}
 
 {{#partial "page"}}
+<!-- Conversion Pixel - IN_Evansville_Kings Great Buys_CNF_Thank You - DO NOT MODIFY -->
+<script src="https://secure.adnxs.com/px?id=1547967&t=1" type="text/javascript"></script>
+<!-- End of Conversion Pixel -->
 <header class="checkoutHeader optimizedCheckout-header">
     <div class="checkoutHeader-content">
         <h1 class="is-srOnly">{{lang 'checkout.title'}}</h1>
@@ -67,6 +31,8 @@
 </header>
 
 {{{ checkout.order_confirmation_content }}}
+
+{{{ footer.scripts }}}
 
 {{/partial}}
 

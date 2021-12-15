@@ -1,158 +1,97 @@
-import 'babel-polyfill';
+__webpack_public_path__ = window.__webpack_public_path__; // eslint-disable-line
 
-import $ from 'jquery';
-import async from 'async';
-import account from './theme/account';
-import auth from './theme/auth';
-import blog from './theme/blog';
-import brand from './theme/brand';
-import cart from './theme/cart';
-import category from './theme/category';
-import contactUs from './theme/contact-us';
-import compare from './theme/compare';
-import errors from './theme/errors';
-import errors404 from './theme/404-error';
-import giftCertificate from './theme/gift-certificate';
-import global from './theme/global';
-import home from './theme/home';
-import orderComplete from './theme/order-complete';
-import rss from './theme/rss';
-import page from './theme/page';
-import product from './theme/product';
-import search from './theme/search';
-import sitemap from './theme/sitemap';
-import subscribe from './theme/subscribe';
-import wishlist from './theme/wishlist';
+import Global from './theme/global';
 
-const PageClasses = {
-    mapping: {
-        'pages/account/orders/all': account,
-        'pages/account/orders/details': account,
-        'pages/account/addresses': account,
-        'pages/account/add-address': account,
-        'pages/account/add-return': account,
-        'pages/account/add-wishlist': wishlist,
-        'pages/account/recent-items': account,
-        'pages/account/download-item': account,
-        'pages/account/edit': account,
-        'pages/account/inbox': account,
-        'pages/account/return-saved': account,
-        'pages/account/returns': account,
-        'pages/auth/login': auth,
-        'pages/auth/account-created': auth,
-        'pages/auth/create-account': auth,
-        'pages/auth/new-password': auth,
-        'pages/auth/forgot-password': auth,
-        'pages/blog': blog,
-        'pages/blog-post': blog,
-        'pages/brand': brand,
-        'pages/brands': brand,
-        'pages/cart': cart,
-        'pages/category': category,
-        'pages/compare': compare,
-        'pages/contact-us': contactUs,
-        'pages/errors': errors,
-        'pages/errors/404': errors404,
-        'pages/gift-certificate/purchase': giftCertificate,
-        'pages/gift-certificate/balance': giftCertificate,
-        'pages/gift-certificate/redeem': giftCertificate,
-        // eslint-disable-next-line
-        'global': global,
-        'pages/home': home,
-        'pages/order-complete': orderComplete,
-        'pages/page': page,
-        'pages/product': product,
-        'pages/search': search,
-        'pages/rss': rss,
-        'pages/sitemap': sitemap,
-        'pages/subscribed': subscribe,
-        'pages/account/wishlist-details': wishlist,
-        'pages/account/wishlists': wishlist,
-        'pages/amp/product-options': product, // papathemes: for amp-iframe product options
-    },
-    /**
-     * Getter method to ensure a good page type is accessed.
-     * @param page
-     * @returns {*}
-     */
-    get(pageKey) {
-        if (this.mapping[pageKey]) {
-            return this.mapping[pageKey];
-        }
+const getAccount = () => import('./theme/account');
+const getLogin = () => import('./theme/auth');
+const noop = null;
 
-        return false;
-    },
+const pageClasses = {
+    account_orderstatus: getAccount,
+    account_order: getAccount,
+    account_addressbook: getAccount,
+    shippingaddressform: getAccount,
+    account_new_return: getAccount,
+    'add-wishlist': () => import('./theme/wishlist'),
+    account_recentitems: getAccount,
+    account_downloaditem: getAccount,
+    editaccount: getAccount,
+    account_inbox: getAccount,
+    account_saved_return: getAccount,
+    account_returns: getAccount,
+    account_paymentmethods: getAccount,
+    account_addpaymentmethod: getAccount,
+    account_editpaymentmethod: getAccount,
+    login: getLogin,
+    createaccount_thanks: getLogin,
+    createaccount: getLogin,
+    getnewpassword: getLogin,
+    forgotpassword: getLogin,
+    blog: noop,
+    blog_post: noop,
+    brand: () => import('./theme/brand'),
+    brands: noop,
+    cart: () => import('./theme/cart'),
+    category: () => import('./theme/category'),
+    compare: () => import('./theme/compare'),
+    page_contact_form: () => import('./theme/contact-us'),
+    error: noop,
+    404: noop,
+    giftcertificates: () => import('./theme/gift-certificate'),
+    giftcertificates_balance: () => import('./theme/gift-certificate'),
+    giftcertificates_redeem: () => import('./theme/gift-certificate'),
+    default: noop,
+    page: noop,
+    product: () => import('./theme/product'),
+    amp_product_options: () => import('./theme/product'),
+    search: () => import('./theme/search'),
+    rss: noop,
+    sitemap: noop,
+    newsletter_subscribe: noop,
+    wishlist: () => import('./theme/wishlist'),
+    wishlists: () => import('./theme/wishlist'),
 };
 
-/**
- *
- * @param {Object} pageObj
- */
-function series(pageObj) {
-    async.series([
-        pageObj.before.bind(pageObj), // Executed first after constructor()
-        pageObj.loaded.bind(pageObj), // Main module logic
-        pageObj.after.bind(pageObj), // Clean up method that can be overridden for cleanup.
-    ], (err) => {
-        if (err) {
-            throw new Error(err);
-        }
-    });
-}
-
-/**
- * Loads the global module that gets executed on every page load.
- * Code that you want to run on every page goes in the global module.
- * @param {object} pages
- * @returns {*}
- */
-function loadGlobal(pages) {
-    const Global = pages.get('global');
-
-    return new Global;
-}
-
-/**
- *
- * @param {function} pageFunc
- * @param {} pages
- */
-function loader(pageFunc, pages) {
-    if (pages.get('global')) {
-        const globalPageManager = loadGlobal(pages);
-
-        globalPageManager.context = pageFunc.context;
-
-        series(globalPageManager);
-    }
-    series(pageFunc);
-}
+const customClasses = {};
 
 /**
  * This function gets added to the global window and then called
  * on page load with the current template loaded and JS Context passed in
- * @param templateFile String
+ * @param pageType String
  * @param contextJSON
  * @returns {*}
  */
-window.stencilBootstrap = function stencilBootstrap(templateFile, contextJSON = '{}') {
-    const pages = PageClasses;
-    const context = JSON.parse(contextJSON);
+window.stencilBootstrap = function stencilBootstrap(pageType, contextJSON = null, loadGlobal = true) {
+    const context = JSON.parse(contextJSON || '{}');
 
     return {
         load() {
             $(() => {
-                const PageTypeFn = pages.get(templateFile); // Finds the appropriate module from the pageType object and store the result as a function.
-
-                if (PageTypeFn) {
-                    const pageType = new PageTypeFn(context);
-
-                    pageType.context = context;
-
-                    return loader(pageType, pages);
+                // Load globals
+                if (loadGlobal) {
+                    Global.load(context);
                 }
 
-                throw new Error(`${templateFile} Module not found`);
+                const importPromises = [];
+
+                // Find the appropriate page loader based on pageType
+                const pageClassImporter = pageClasses[pageType];
+                if (typeof pageClassImporter === 'function') {
+                    importPromises.push(pageClassImporter());
+                }
+
+                // See if there is a page class default for a custom template
+                const customTemplateImporter = customClasses[context.template];
+                if (typeof customTemplateImporter === 'function') {
+                    importPromises.push(customTemplateImporter());
+                }
+
+                // Wait for imports to resolve, then call load() on them
+                Promise.all(importPromises).then(imports => {
+                    imports.forEach(imported => {
+                        imported.default.load(context);
+                    });
+                });
             });
         },
     };

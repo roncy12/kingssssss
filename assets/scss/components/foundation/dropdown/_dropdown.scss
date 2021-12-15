@@ -53,50 +53,57 @@
 
 .dropdown-menu-button {
     width: 100%;
+
     &.is-open {
         border-bottom-left-radius: 0px;
         border-bottom-right-radius: 0px;
     }
+
     .icon {
         float: right;
         margin-left: 10px;
-
-        svg {
-            fill: stencilColor("button--default-color");
-        }
     }
 }
 
 #wishlist-dropdown.is-open {
-    background: white;
+    background: transparent;
     left: auto !important;
     max-width: none !important;
     width: 100% !important;
+
     @include breakpoint('small') {
         padding-right: 20px;
     }
+
     @include breakpoint('medium') {
         padding-right: 0px;
     }
+
     @include breakpoint('large') {
         padding-right: 11px;
     }
+
     &:focus {
         outline: none;
     }
+
     [data-wishlist] {
         border-top: none;
         margin-bottom: 0px;
         width: 100%;
     }
+
     .button {
+        background-color: stencilColor("dropdown--wishList-backgroundColor");
         border-top-left-radius: 0px;
         border-top-right-radius: 0px;
         width: 100%;
     }
+
     .button--has-items {
         font-weight: 700;
     }
+
     li:not(:last-child) .button {
         border-bottom: none;
         border-radius: 0px;

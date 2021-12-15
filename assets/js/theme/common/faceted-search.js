@@ -1,5 +1,4 @@
 import { hooks, api } from '@bigcommerce/stencil-utils';
-import $ from 'jquery';
 import _ from 'lodash';
 import Url from 'url';
 import urlUtils from './url-utils';
@@ -71,7 +70,7 @@ class FacetedSearch {
         // Mark initially collapsed accordions
         $(this.options.accordionToggleSelector).each((index, accordionToggle) => {
             const $accordionToggle = $(accordionToggle);
-            const collapsible = $accordionToggle.data('collapsible-instance');
+            const collapsible = $accordionToggle.data('collapsibleInstance');
 
             if (collapsible.isCollapsed) {
                 this.collapsedFacets.push(collapsible.targetId);
@@ -143,7 +142,7 @@ class FacetedSearch {
 
     collapseFacetItems($navList) {
         const id = $navList.attr('id');
-        const hasMoreResults = $navList.data('has-more-results');
+        const hasMoreResults = $navList.data('hasMoreResults');
 
         if (hasMoreResults) {
             this.collapsedFacetItems = _.union(this.collapsedFacetItems, [id]);
@@ -156,7 +155,7 @@ class FacetedSearch {
         const id = $navList.attr('id');
 
         // Toggle depending on `collapsed` flag
-        if (_.contains(this.collapsedFacetItems, id)) {
+        if (_.includes(this.collapsedFacetItems, id)) {
             this.getMoreFacetResults($navList);
 
             return true;
@@ -208,13 +207,13 @@ class FacetedSearch {
     }
 
     expandFacet($accordionToggle) {
-        const collapsible = $accordionToggle.data('collapsible-instance');
+        const collapsible = $accordionToggle.data('collapsibleInstance');
 
         collapsible.open();
     }
 
     collapseFacet($accordionToggle) {
-        const collapsible = $accordionToggle.data('collapsible-instance');
+        const collapsible = $accordionToggle.data('collapsibleInstance');
 
         collapsible.close();
     }
@@ -266,7 +265,7 @@ class FacetedSearch {
         $navLists.each((index, navList) => {
             const $navList = $(navList);
             const id = $navList.attr('id');
-            const shouldCollapse = _.contains(this.collapsedFacetItems, id);
+            const shouldCollapse = _.includes(this.collapsedFacetItems, id);
 
             if (shouldCollapse) {
                 this.collapseFacetItems($navList);
@@ -281,9 +280,9 @@ class FacetedSearch {
 
         $accordionToggles.each((index, accordionToggle) => {
             const $accordionToggle = $(accordionToggle);
-            const collapsible = $accordionToggle.data('collapsible-instance');
+            const collapsible = $accordionToggle.data('collapsibleInstance');
             const id = collapsible.targetId;
-            const shouldCollapse = _.contains(this.collapsedFacets, id);
+            const shouldCollapse = _.includes(this.collapsedFacets, id);
 
             if (shouldCollapse) {
                 this.collapseFacet($accordionToggle);
@@ -299,6 +298,7 @@ class FacetedSearch {
 
         // DOM events
         $(window).on('statechange', this.onStateChange);
+        $(window).on('popstate', this.onPopState);
         $(document).on('click', this.options.showMoreToggleSelector, this.onToggleClick);
         $(document).on('toggle.collapsible', this.options.accordionToggleSelector, this.onAccordionToggle);
         $(document).on('keyup', this.options.facetedSearchFilterItems, this.filterFacetItems);
@@ -313,6 +313,7 @@ class FacetedSearch {
     unbindEvents() {
         // DOM events
         $(window).off('statechange', this.onStateChange);
+        $(window).off('popstate', this.onPopState);
         $(document).off('click', this.options.showMoreToggleSelector, this.onToggleClick);
         $(document).off('toggle.collapsible', this.options.accordionToggleSelector, this.onAccordionToggle);
         $(document).off('keyup', this.options.facetedSearchFilterItems, this.filterFacetItems);
@@ -363,15 +364,19 @@ class FacetedSearch {
     }
 
     onSortBySubmit(event) {
-        const url = Url.parse(location.href, true);
+        const url = Url.parse(window.location.href, true);
         const queryParams = $(event.currentTarget).serialize().split('=');
 
         url.query[queryParams[0]] = queryParams[1];
         delete url.query.page;
 
+        // Url object `query` is not a traditional JavaScript Object on all systems, clone it instead
+        const urlQueryParams = {};
+        Object.assign(urlQueryParams, url.query);
+
         event.preventDefault();
 
-        urlUtils.goToUrl(Url.format({ pathname: url.pathname, search: urlUtils.buildQueryString(url.query) }));
+        urlUtils.goToUrl(Url.format({ pathname: url.pathname, search: urlUtils.buildQueryString(urlQueryParams) }));
     }
 
     onRangeSubmit(event) {
@@ -381,10 +386,21 @@ class FacetedSearch {
             return;
         }
 
-        const url = Url.parse(location.href);
-        const queryParams = decodeURI($(event.currentTarget).serialize());
+        const url = Url.parse(window.location.href, true);
+        let queryParams = decodeURI($(event.currentTarget).serialize()).split('&');
+        queryParams = urlUtils.parseQueryParams(queryParams);
 
-        urlUtils.goToUrl(Url.format({ pathname: url.pathname, search: `?${queryParams}` }));
+        for (const key in queryParams) {
+            if (queryParams.hasOwnProperty(key)) {
+                url.query[key] = queryParams[key];
+            }
+        }
+
+        // Url object `query` is not a traditional JavaScript Object on all systems, clone it instead
+        const urlQueryParams = {};
+        Object.assign(urlQueryParams, url.query);
+
+        urlUtils.goToUrl(Url.format({ pathname: url.pathname, search: urlUtils.buildQueryString(urlQueryParams) }));
     }
 
     onStateChange() {
@@ -393,7 +409,7 @@ class FacetedSearch {
 
     onAccordionToggle(event) {
         const $accordionToggle = $(event.currentTarget);
-        const collapsible = $accordionToggle.data('collapsible-instance');
+        const collapsible = $accordionToggle.data('collapsibleInstance');
         const id = collapsible.targetId;
 
         if (collapsible.isCollapsed) {
@@ -401,6 +417,19 @@ class FacetedSearch {
         } else {
             this.collapsedFacets = _.without(this.collapsedFacets, id);
         }
+    }
+
+    onPopState() {
+        const currentUrl = window.location.href;
+        const searchParams = new URLSearchParams(currentUrl);
+        // If searchParams does not contain a page value then modify url query string to have page=1
+        if (!searchParams.has('page')) {
+            const linkUrl = $('.pagination-link').attr('href');
+            const re = /page=[0-9]+/i;
+            const updatedLinkUrl = linkUrl.replace(re, 'page=1');
+            window.history.replaceState({}, document.title, updatedLinkUrl);
+        }
+        $(window).trigger('statechange');
     }
 }
 

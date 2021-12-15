@@ -26,12 +26,12 @@
             {{#each items}}
                 <li class="navList-item">
                     <a
-                        href="{{url}}"
+                        href="{{ url }}"
                         class="navList-action navList-action--checkbox {{#if selected }} is-selected {{/if}} {{#if has_sub_categories }} has-children {{/if}}"
                         rel="nofollow"
                         data-id="{{ id }}"
                         data-faceted-search-facet>
-                        {{ title }}
+                        {{{ sanitize title }}}
                         {{#if ../show_product_counts}}
                             {{#if count}}
                                 <span>({{ count }})</span>
@@ -45,12 +45,11 @@
             {{/each}}
         </ul>
 
-  {{#if show_more_toggle}}
+        {{#if show_more_toggle}}
             <a href="#facetedSearch-navList--{{hyphenate facet }}" role="button" class="toggleLink">
                 <span class="toggleLink-text toggleLink-text--off">{{lang 'search.faceted.show-more'}}</span>
             </a>
         {{/if}}
-
     </div>
 </div>
 {{/if}}

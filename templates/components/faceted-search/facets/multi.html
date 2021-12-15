@@ -30,7 +30,7 @@
                         class="navList-action navList-action--checkbox {{#if selected }} is-selected {{/if}}"
                         rel="nofollow"
                         data-faceted-search-facet>
-                        {{ title }}
+                        {{{ sanitize title }}}
                         {{#if ../show_product_counts}}
                             <span>({{ count }})</span>
                         {{/if}}
@@ -45,13 +45,11 @@
             {{/each}}
         </ul>
 
-
         {{#if show_more_toggle}}
             <a href="#facetedSearch-navList--{{hyphenate facet }}" role="button" class="toggleLink">
                 <span class="toggleLink-text toggleLink-text--off">{{lang 'search.faceted.show-more'}}</span>
             </a>
         {{/if}}
-
     </div>
 </div>
 {{/if}}

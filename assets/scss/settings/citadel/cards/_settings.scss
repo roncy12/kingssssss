@@ -21,8 +21,8 @@ $card-figcaption-textAlign:                 center;
 $card-figcaption-body-paddingHorizontal:    null;
 $card-figcaption-title-color:               null;
 $card-figcaption-title-marginBottom:        null;
-$card-figcaption-button-background:         rgba(stencilColor("card-figcaption-button-background"), 1); // emthemesModez mods
-$card-figcaption-button-backgroundHover:    darken(stencilColor("card-figcaption-button-background"), 5%); // emthemesModez mods
+$card-figcaption-button-background:         rgba(stencilColor("card-figcaption-button-background"), 0.9);
+$card-figcaption-button-backgroundHover:    stencilColor("card-figcaption-button-background");
 $card-figcaption-button-borderColor:        null;
 $card-figcaption-button-color:              stencilColor("card-figcaption-button-color");
 
@@ -60,8 +60,7 @@ $card-figcaption-margin:                    0;
 
 $card-figcaption-body-display:              inline-block;
 
-// $card-title-fontSize:                       fontSize("smaller"); // emthemesModez mods
-$card-title-fontSize:                       fontSize("base");
+$card-title-fontSize:                       fontSize("smaller");
 $card-title-margin:                         0 0 spacing("sixth");
 $card-title-color:                          stencilColor("card-title-color");
 $card-title-color-hover:                    stencilColor("card-title-color-hover");
@@ -69,8 +68,7 @@ $card-title-textDecoration:                 none;
 
 $card-text-marginBottom:                    spacing("eighth");
 
-// $card-figcaption-button-border:             none; // emthemesModez mods
-$card-figcaption-button-border:             1px solid stencilColor("card-figcaption-button-borderColor");
+$card-figcaption-button-border:             none;
 $card-figcaption-button-display:            block;
 $card-figcaption-button-margin:             0;
 $card-figcaption-button-margin:             spacing("quarter") 0 0;
